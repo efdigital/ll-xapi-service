@@ -67,11 +67,15 @@ const creatBatchQuery = (batch: UnorderedBulkOperation) => (fullActivity: FullAc
   const mongoSet = createMongoSet(fullActivity);
   // const mongoAddToSet = createMongoAddToSet(fullActivity);
 
+  if (isEmpty(mongoSet)) {
+    return;
+  }
+
   batch
     .find(mongoQuery)
     .upsert()
     .updateOne({
-      ...(!isEmpty(mongoSet) ? { $set: mongoSet } : {}),
+      ...{ $set: mongoSet },
       // ...(!isEmpty(mongoAddToSet) ? { $addToSet: mongoAddToSet } : {}),
     });
 };
@@ -85,5 +89,7 @@ export default (config: FacadeConfig): Signature => async ({ fullActivities }) =
   const batch = collection.initializeUnorderedBulkOp();
 
   fullActivities.forEach(creatBatchQuery(batch));
-  await batch.execute();
+  if (batch.batches.length > 0) {
+    await batch.execute();
+  }
 };
