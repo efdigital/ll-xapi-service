@@ -116,10 +116,10 @@ export default async ({ config, models, client }: Opts): Promise<void> => {
           mapValues(matchingActivity.context?.contextActivities, (matchingContextActivities) =>
             matchingContextActivities !== undefined
               ? matchingContextActivities.map(
-                  (matchingContextActivity) => matchingContextActivity.id,
+                  (matchingContextActivity: any) => matchingContextActivity.id,
                 )
               : matchingContextActivities,
-          ),
+          ) as FullActivityContextActivities,
       );
 
       const mergedContextActivities = contextActivitiesForFullActivity.reduce(

@@ -17,9 +17,8 @@ export default (config: Config) => {
     const opResult = await collection.findOneAndDelete(stateFilter, {});
 
     // Determines if the identifier was deleted.
-    // Docs: https://docs.mongodb.com/manual/reference/command/getLastError/#getLastError.n
-    const matchedDocuments = opResult.lastErrorObject?.n as number;
-    const wasDeleted = matchedDocuments === 1;
+    // In MongoDB driver 6.x, check if we got a result back (value exists)
+    const wasDeleted = opResult !== null && opResult.value !== null;
 
     // Returns the result of the deletion if the document was deleted.
     if (wasDeleted) {

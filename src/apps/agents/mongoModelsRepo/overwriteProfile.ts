@@ -56,8 +56,12 @@ export default (config: Config) => {
       );
 
       // Determines if the Profile was updated.
-      const updatedDocuments = updateOpResult.lastErrorObject?.n as number;
-      if (updatedDocuments === 1) {
+      // In MongoDB driver 6.x, check if we got a result back (value exists) and no upsert occurred
+      const wasUpdated =
+        updateOpResult !== null &&
+        updateOpResult.value !== null &&
+        !updateOpResult.lastErrorObject?.upserted;
+      if (wasUpdated) {
         const opResult = await collection.findOne({ _id: updateOpResult.value?._id });
 
         return {
@@ -79,7 +83,7 @@ export default (config: Config) => {
       },
     );
 
-    const wasCreated = !createOpResult.lastErrorObject?.updatedExisting;
+    const wasCreated = createOpResult !== null && !createOpResult.lastErrorObject?.updatedExisting;
 
     // Throws the IfMatch error when the profile already exists.
     // This is because there must have been an ETag mismatch in the previous update.
@@ -91,7 +95,10 @@ export default (config: Config) => {
       throw new IfNoneMatch();
     }
 
-    const id = wasCreated ? createOpResult.lastErrorObject?.upserted : createOpResult.value?._id;
+    const id =
+      wasCreated && createOpResult !== null
+        ? createOpResult.lastErrorObject?.upserted
+        : createOpResult?.value?._id;
 
     const opResult = await collection.findOne({ _id: id });
 

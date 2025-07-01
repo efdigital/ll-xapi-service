@@ -66,8 +66,12 @@ export default (config: Config) => {
       );
 
       // Determines if the Profile was updated.
-      const updatedDocuments = updateOpResult.lastErrorObject?.n as number;
-      if (updatedDocuments === 1) {
+      // In MongoDB driver 6.x, check if we got a result back (value exists) and no upsert occurred
+      const wasUpdated =
+        updateOpResult !== null &&
+        updateOpResult.value !== null &&
+        !updateOpResult.lastErrorObject?.upserted;
+      if (wasUpdated) {
         return;
       }
     }
@@ -88,13 +92,14 @@ export default (config: Config) => {
     );
 
     // Determines if the Profile was created or found.
-    const wasCreated = createOpResult.lastErrorObject?.upserted !== undefined;
+    const wasCreated =
+      createOpResult !== null && createOpResult.lastErrorObject?.upserted !== undefined;
 
     // When the profile is found at the create stage but not the update stage,
     // And the ifNoneMatch option was not provided.
     // Then the exsting profile either has the wrong content or didn't match the ifMatch option.
     if (!wasCreated && !checkIfNoneMatch) {
-      if (checkIfMatch && createOpResult.value?.etag !== opts.ifMatch) {
+      if (checkIfMatch && createOpResult !== null && createOpResult.value?.etag !== opts.ifMatch) {
         throw new IfMatch();
       }
       throw new NonJsonObject();

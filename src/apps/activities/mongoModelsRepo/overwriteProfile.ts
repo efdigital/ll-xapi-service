@@ -62,9 +62,12 @@ export default (config: Config) => {
       );
 
       // Determines if the Profile was updated.
-      // Docs: https://docs.mongodb.com/manual/reference/command/getLastError/#getLastError.n
-      const updatedDocuments = updateOpResult.lastErrorObject?.n as number;
-      if (updatedDocuments === 1) {
+      // In MongoDB driver 6.x, check if we got a result back (value exists) and no upsert occurred
+      const wasUpdated =
+        updateOpResult !== null &&
+        updateOpResult.value !== null &&
+        !updateOpResult.lastErrorObject?.upserted;
+      if (wasUpdated) {
         const opResult = await collection.findOne({ _id: updateOpResult.value?._id });
 
         return {
