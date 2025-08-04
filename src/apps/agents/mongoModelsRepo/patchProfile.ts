@@ -62,6 +62,7 @@ export default (config: Config) => {
         {
           returnDocument: ReturnDocument.AFTER, // Ensures the updated document is returned.
           upsert: false, // Does not create the profile when it doesn't exist.
+          includeResultMetadata: true, // Maintains backward compatibility with MongoDB driver 4.x behavior
         },
       );
 
@@ -88,6 +89,7 @@ export default (config: Config) => {
       {
         returnDocument: ReturnDocument.AFTER, // Ensures the updated document is returned.
         upsert: true, // Creates the profile when it's not found.
+        includeResultMetadata: true, // Maintains backward compatibility with MongoDB driver 4.x behavior
       },
     );
 
