@@ -31,6 +31,7 @@ export default (config: Config) => {
       {
         returnDocument: ReturnDocument.AFTER, // Ensures the updated document is returned.
         upsert: true, // Creates the state when it's not found.
+        includeResultMetadata: true, // Maintains backward compatibility with MongoDB driver 4.x behavior
       },
     );
 

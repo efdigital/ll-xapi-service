@@ -32,12 +32,12 @@ export default (config: Config) => {
     );
 
     // Determines if the identifier was deleted.
-    // In MongoDB driver 6.x, check if we got a result back (value exists)
-    const wasDeleted = opResult !== null && opResult.value !== null;
+    // In MongoDB driver 6.x, findOneAndDelete returns the document directly when includeResultMetadata is false (default)
+    const wasDeleted = opResult !== null;
 
     // Returns the result of the deletion if the document was deleted.
     if (wasDeleted) {
-      const deletedDoc = opResult.value as any;
+      const deletedDoc = opResult as any;
       return {
         contentType: deletedDoc.contentType,
         extension: deletedDoc.extension,

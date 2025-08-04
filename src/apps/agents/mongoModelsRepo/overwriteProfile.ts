@@ -52,6 +52,7 @@ export default (config: Config) => {
         {
           returnDocument: ReturnDocument.AFTER,
           upsert: false,
+          includeResultMetadata: true, // Maintains backward compatibility with MongoDB driver 4.x behavior
         },
       );
 
@@ -80,6 +81,7 @@ export default (config: Config) => {
       {
         returnDocument: ReturnDocument.AFTER,
         upsert: true,
+        includeResultMetadata: true, // Maintains backward compatibility with MongoDB driver 4.x behavior
       },
     );
 
